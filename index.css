@@ -78,3 +78,8 @@ input {
     border: 1px solid white;
     background: rgb(12, 157, 253);
 }
+
+.remoteMicrophone,
+.remoteCamera {
+    cursor: pointer;
+}

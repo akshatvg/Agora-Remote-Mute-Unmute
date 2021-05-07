@@ -84,12 +84,23 @@ async function join() {
                         <p>${singleMember}</p>
                     </div>
                     <div class="mb-4">
-                        <a href="#!"><i class="fa text-white fa-microphone mx-3 remoteMicrophone" id="remoteAudio-${singleMember}"></i></a>
-                        <a href="#!"><i class="fa text-white fa-video remoteCamera" id="remoteVideo-${singleMember}"></i></a>
+                        <i class="fa text-white fa-microphone mx-3 remoteMicrophone" id="remoteAudio-${singleMember}" onclick="toggleRemoteAudio(this.id)"></i>
+                        <i class="fa text-white fa-video remoteCamera" id="remoteVideo-${singleMember}" onclick="toggleRemoteVideo(this.id)"></i>
                     </div>
                  </li>`);
                 });
                 $("#insert-all-users").html(newHTML.join(""));
+            });
+            // Send Channel Message
+            $("#remoteAudio-" + singleMember).click(function (singleMember) {
+                singleMessage = singleMember;
+                channel.sendMessage({ text: singleMessage }).then(() => {
+                    console.log("Message sent successfully.");
+                    console.log("Your message was: " + singleMessage + " by " + accountName);
+                    $("#messageBox").append("<br> <b>Sender:</b> " + accountName + "<br> <b>Message:</b> " + singleMessage + "<br>");
+                }).catch(error => {
+                    console.log("Message wasn't sent due to an error: ", error);
+                });
             });
             // Receive RTM Channel Message
             channel.on('ChannelMessage', ({ text }, senderId) => {
@@ -105,14 +116,14 @@ async function join() {
                     console.log(memberNames);
                     var newHTML = $.map(memberNames, function (singleMember) {
                         return (`<li class="mt-2">
-        <div class="row">
-            <p>${singleMember}</p>
-        </div>
-        <div class="mb-4">
-            <a href="#!"><i class="fa text-white fa-microphone mx-3 remoteMicrophone" id="remoteAudio-${singleMember}"></i></a>
-            <a href="#!"><i class="fa text-white fa-video remoteCamera" id="remoteVideo-${singleMember}"></i></a>
-        </div>
-     </li>`);
+          <div class="row">
+              <p>${singleMember}</p>
+           </div>
+           <div class="mb-4">
+             <i class="fa text-white fa-microphone mx-3 remoteMicrophone" id="remoteAudio-${singleMember}" onclick="toggleRemoteAudio(this.id)"></i>
+             <i class="fa text-white fa-video remoteCamera" id="remoteVideo-${singleMember}" onclick="toggleRemoteVideo(this.id)"></i>
+            </div>
+         </li>`);
                     });
                     $("#insert-all-users").html(newHTML.join(""));
                 });
@@ -129,8 +140,8 @@ async function join() {
                 <p>${singleMember}</p>
             </div>
             <div class="mb-4">
-                <a href="#!"><i class="fa text-white fa-microphone mx-3 remoteMicrophone" id="remoteAudio-${singleMember}"></i></a>
-                <a href="#!"><i class="fa text-white fa-video remoteCamera" id="remoteVideo-${singleMember}"></i></a>
+                <i class="fa text-white fa-microphone mx-3 remoteMicrophone" id="remoteAudio-${singleMember}" onclick="toggleRemoteAudio(this.id)"></i>
+                <i class="fa text-white fa-video remoteCamera" id="remoteVideo-${singleMember}" onclick="toggleRemoteVideo(this.id)"></i>
             </div>
          </li>`);
                     });
@@ -220,7 +231,7 @@ function enableUiControls() {
     });
 }
 
-// Toggle Mic
+// Toggle Local Mic
 function toggleMic() {
     if ($("#mic-icon").hasClass('fa-microphone')) {
         localTracks.audioTrack.setEnabled(false);
@@ -232,7 +243,7 @@ function toggleMic() {
     $("#mic-icon").toggleClass('fa-microphone').toggleClass('fa-microphone-slash');
 }
 
-// Toggle Video
+// Toggle Local Video
 function toggleVideo() {
     if ($("#video-icon").hasClass('fa-video')) {
         localTracks.videoTrack.setEnabled(false);
@@ -243,3 +254,34 @@ function toggleVideo() {
     }
     $("#video-icon").toggleClass('fa-video').toggleClass('fa-video-slash');
 }
+
+// Toggle Remote Audio
+function toggleRemoteAudio(divId) {
+    console.log("Remote video toggle reached with " + divId);
+    if ($("#" + divId).hasClass('fa-microphone')) {
+        localTracks.audioTrack.setEnabled(false);
+        console.log("Remote Audio Muted for: " + divId);
+    } else {
+        localTracks.audioTrack.setEnabled(true);
+        console.log("Remote Audio Unmuted for: " + divId);
+    }
+    $("#" + divId).toggleClass('fa-microphone').toggleClass('fa-microphone-slash');
+}
+
+// Toggle Remote Video
+function toggleRemoteVideo(divId) {
+    console.log("Remote video toggle reached with " + divId);
+    if ($("#" + divId).hasClass('fa-video')) {
+        localTracks.videoTrack.setEnabled(false);
+        console.log("Remote Video Muted for: " + divId);
+    } else {
+        localTracks.videoTrack.setEnabled(true);
+        console.log("Remote Video Unmuted for: " + divId);
+    }
+    $("#" + divId).toggleClass('fa-video').toggleClass('fa-video-slash');
+}
+
+// To Do:
+// Not using RTM messages as of now
+// Need to synchronise or remove local video and audio muting controls
+// Need to update controls in all users list for all users
