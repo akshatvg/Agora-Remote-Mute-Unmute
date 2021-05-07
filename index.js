@@ -78,17 +78,18 @@ async function join() {
                 console.log("------------------------------");
                 console.log("All members in the channel are as follows: ");
                 console.log(memberNames);
-                $("#insert-all-users").html(`
-                <li class="mt-2">
+                var newHTML = $.map(memberNames, function (singleMember) {
+                    return (`<li class="mt-2">
                     <div class="row">
-                        <p>${memberNames[0]}</p>
+                        <p>${singleMember}</p>
                     </div>
                     <div class="mb-4">
-                        <a href="#!"><i class="fa text-white fa-microphone mx-3 remoteMicrophone" id="remoteAudio-${memberNames[0]}"></i></a>
-                        <a href="#!"><i class="fa text-white fa-video remoteCamera" id="remoteVideo-${memberNames[0]}"></i></a>
+                        <a href="#!"><i class="fa text-white fa-microphone mx-3 remoteMicrophone" id="remoteAudio-${singleMember}"></i></a>
+                        <a href="#!"><i class="fa text-white fa-video remoteCamera" id="remoteVideo-${singleMember}"></i></a>
                     </div>
-                 </li>
-                `);
+                 </li>`);
+                });
+                $("#insert-all-users").html(newHTML.join(""));
             });
             // Receive RTM Channel Message
             channel.on('ChannelMessage', ({ text }, senderId) => {
@@ -96,6 +97,46 @@ async function join() {
                 console.log("The message is: " + text + " by " + senderId);
                 $("#actual-text").append("<br> <b>Speaker:</b> " + senderId + "<br> <b>Message:</b> " + text + "<br>");
             });
+            // Display channel member joined updated users
+            channel.on('MemberJoined', function () {
+                // Get all members in RTM Channel
+                channel.getMembers().then((memberNames) => {
+                    console.log("New member joined so updated list is: ");
+                    console.log(memberNames);
+                    var newHTML = $.map(memberNames, function (singleMember) {
+                        return (`<li class="mt-2">
+        <div class="row">
+            <p>${singleMember}</p>
+        </div>
+        <div class="mb-4">
+            <a href="#!"><i class="fa text-white fa-microphone mx-3 remoteMicrophone" id="remoteAudio-${singleMember}"></i></a>
+            <a href="#!"><i class="fa text-white fa-video remoteCamera" id="remoteVideo-${singleMember}"></i></a>
+        </div>
+     </li>`);
+                    });
+                    $("#insert-all-users").html(newHTML.join(""));
+                });
+            })
+            // Display channel member left updated users
+            channel.on('MemberLeft', function () {
+                // Get all members in RTM Channel
+                channel.getMembers().then((memberNames) => {
+                    console.log("A member left so updated list is: ");
+                    console.log(memberNames);
+                    var newHTML = $.map(memberNames, function (singleMember) {
+                        return (`<li class="mt-2">
+            <div class="row">
+                <p>${singleMember}</p>
+            </div>
+            <div class="mb-4">
+                <a href="#!"><i class="fa text-white fa-microphone mx-3 remoteMicrophone" id="remoteAudio-${singleMember}"></i></a>
+                <a href="#!"><i class="fa text-white fa-video remoteCamera" id="remoteVideo-${singleMember}"></i></a>
+            </div>
+         </li>`);
+                    });
+                    $("#insert-all-users").html(newHTML.join(""));
+                });
+            })
         }).catch(error => {
             console.log('AgoraRTM client channel join failed: ', error);
         }).catch(err => {
