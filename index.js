@@ -20,6 +20,7 @@ var options = {
 // Join Channel
 $("#join-form").submit(async function (e) {
     e.preventDefault();
+    enableUiControls();
     $("#join").attr("disabled", true);
     try {
         options.appid = $("#appid").val();
@@ -58,6 +59,8 @@ async function join() {
     // Publish local tracks to channel
     await client.publish(Object.values(localTracks));
     console.log("Publish success");
+    $("#mic-btn").prop("disabled", false);
+    $("#video-btn").prop("disabled", false);
     // Create Agora RTM client
     const clientRTM = AgoraRTM.createInstance($("#appid").val(), { enableLogUpload: false });
     var accountName = $('#accountName').val();
@@ -70,6 +73,23 @@ async function join() {
         channel = clientRTM.createChannel(channelName);
         channel.join().then(() => {
             console.log('AgoraRTM client channel join success.');
+            // Get all members in RTM Channel
+            channel.getMembers().then((memberNames) => {
+                console.log("------------------------------");
+                console.log("All members in the channel are as follows: ");
+                console.log(memberNames);
+                $("#insert-all-users").html(`
+                <li class="mt-2">
+                    <div class="row">
+                        <p>${memberNames[0]}</p>
+                    </div>
+                    <div class="mb-4">
+                        <a href="#!"><i class="fa text-white fa-microphone mx-3 remoteMicrophone" id="remoteAudio-${memberNames[0]}"></i></a>
+                        <a href="#!"><i class="fa text-white fa-video remoteCamera" id="remoteVideo-${memberNames[0]}"></i></a>
+                    </div>
+                 </li>
+                `);
+            });
             // Receive RTM Channel Message
             channel.on('ChannelMessage', ({ text }, senderId) => {
                 console.log("Message received successfully.");
@@ -82,6 +102,10 @@ async function join() {
             console.log('AgoraRTM client login failure: ', err);
         });
     });
+    document.getElementById("leave").onclick = async function () {
+        console.log("Client logged out of RTM.");
+        await clientRTM.logout();
+    }
 }
 
 // Leave Function
@@ -104,7 +128,10 @@ async function leave() {
     $("#local-player-name").text("");
     $("#join").attr("disabled", false);
     $("#leave").attr("disabled", true);
+    $("#mic-btn").prop("disabled", true);
+    $("#video-btn").prop("disabled", true);
     console.log("Client leaves channel success");
+    $("#insert-all-users").html(``);
 }
 
 // Subscribe function
@@ -140,4 +167,38 @@ function handleUserUnpublished(user) {
     const id = user.uid;
     delete remoteUsers[id];
     $(`#player-wrapper-${id}`).remove();
+}
+
+// Action buttons
+function enableUiControls() {
+    $("#mic-btn").click(function () {
+        toggleMic();
+    });
+    $("#video-btn").click(function () {
+        toggleVideo();
+    });
+}
+
+// Toggle Mic
+function toggleMic() {
+    if ($("#mic-icon").hasClass('fa-microphone')) {
+        localTracks.audioTrack.setEnabled(false);
+        console.log("Audio Muted.");
+    } else {
+        localTracks.audioTrack.setEnabled(true);
+        console.log("Audio Unmuted.");
+    }
+    $("#mic-icon").toggleClass('fa-microphone').toggleClass('fa-microphone-slash');
+}
+
+// Toggle Video
+function toggleVideo() {
+    if ($("#video-icon").hasClass('fa-video')) {
+        localTracks.videoTrack.setEnabled(false);
+        console.log("Video Muted.");
+    } else {
+        localTracks.videoTrack.setEnabled(true);
+        console.log("Video Unmuted.");
+    }
+    $("#video-icon").toggleClass('fa-video').toggleClass('fa-video-slash');
 }
