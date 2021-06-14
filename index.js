@@ -108,15 +108,17 @@ async function RTMJoin() {
                 console.log("All members in the channel are as follows: ");
                 console.log(memberNames);
                 var newHTML = $.map(memberNames, function (singleMember) {
-                    return (`<li class="mt-2">
-                <div class="row">
-                    <p>${singleMember}</p>
-                </div>
-                <div class="mb-4">
-                    <button class="text-white btn btn-control mx-3 remoteMicrophone micOn" id="remoteAudio-${singleMember}">Toggle Mic</button>
-                    <button class="text-white btn btn-control remoteCamera camOn" id="remoteVideo-${singleMember}">Toggle Video</button>
-                </div>
-             </li>`);
+                    if (singleMember != accountName) {
+                        return (`<li class="mt-2">
+                  <div class="row">
+                      <p>${singleMember}</p>
+                   </div>
+                   <div class="mb-4">
+                     <button class="text-white btn btn-control mx-3 remoteMicrophone micOn" id="remoteAudio-${singleMember}">Toggle Mic</button>
+                     <button class="text-white btn btn-control remoteCamera camOn" id="remoteVideo-${singleMember}">Toggle Video</button>
+                    </div>
+                 </li>`);
+                    }
                 });
                 $("#insert-all-users").html(newHTML.join(""));
             });
@@ -192,7 +194,8 @@ async function RTMJoin() {
                     console.log("New member joined so updated list is: ");
                     console.log(memberNames);
                     var newHTML = $.map(memberNames, function (singleMember) {
-                        return (`<li class="mt-2">
+                        if (singleMember != accountName) {
+                            return (`<li class="mt-2">
                       <div class="row">
                           <p>${singleMember}</p>
                        </div>
@@ -201,6 +204,7 @@ async function RTMJoin() {
                          <button class="text-white btn btn-control remoteCamera camOn" id="remoteVideo-${singleMember}">Toggle Video</button>
                         </div>
                      </li>`);
+                        }
                     });
                     $("#insert-all-users").html(newHTML.join(""));
                 });
@@ -212,15 +216,17 @@ async function RTMJoin() {
                     console.log("A member left so updated list is: ");
                     console.log(memberNames);
                     var newHTML = $.map(memberNames, function (singleMember) {
-                        return (`<li class="mt-2">
-                       <div class="row">
-                           <p>${singleMember}</p>
+                        if (singleMember != accountName) {
+                            return (`<li class="mt-2">
+                      <div class="row">
+                          <p>${singleMember}</p>
                        </div>
                        <div class="mb-4">
-                           <button class="text-white btn btn-control mx-3 remoteMicrophone micOn" id="remoteAudio-${singleMember}">Toggle Mic</button>
-                           <button class="text-white btn btn-control remoteCamera camOn" id="remoteVideo-${singleMember}">Toggle Video</button>
-                       </div>
-                    </li>`);
+                         <button class="text-white btn btn-control mx-3 remoteMicrophone micOn" id="remoteAudio-${singleMember}">Toggle Mic</button>
+                         <button class="text-white btn btn-control remoteCamera camOn" id="remoteVideo-${singleMember}">Toggle Video</button>
+                        </div>
+                     </li>`);
+                        }
                     });
                     $("#insert-all-users").html(newHTML.join(""));
                 });
@@ -308,5 +314,3 @@ function toggleVideo() {
     }
     $("#video-icon").toggleClass('fa-video').toggleClass('fa-video-slash');
 }
-
-// Remove own user
