@@ -133,10 +133,8 @@ async function RTMJoin() {
                 ).then(sendResult => {
                     if (sendResult.hasPeerReceived) {
                         console.log("Message has been received by: " + peerId + " Message: " + peerMessage);
-                        toggleRemoteAudio(peerId);
                     } else {
                         console.log("Message sent to: " + peerId + " Message: " + peerMessage);
-                        toggleRemoteAudio(peerId);
                     }
                 })
             });
@@ -153,10 +151,8 @@ async function RTMJoin() {
                 ).then(sendResult => {
                     if (sendResult.hasPeerReceived) {
                         console.log("Message has been received by: " + peerId + " Message: " + peerMessage);
-                        toggleRemoteVideo(peerId);
                     } else {
                         console.log("Message sent to: " + peerId + " Message: " + peerMessage);
-                        toggleRemoteVideo(peerId);
                     }
                 })
             });
@@ -169,8 +165,31 @@ async function RTMJoin() {
                 $("#actual-text").append("<br> <b>Speaker:</b> " + senderId + "<br> <b>Message:</b> " + text + "<br>");
             });
             // Display messages from peer
-            client.on('MessageFromPeer', function (message, peerId) {
-                console.log(peerId + "muted your" + message);
+            clientRTM.on('MessageFromPeer', function ({
+                text
+            }, peerId) {
+                console.log(peerId + " muted/unmuted your " + text);
+                if (text == "audio") {
+                    console.log("Remote video toggle reached with " + peerId);
+                    if ($("#remoteAudio-" + peerId).hasClass('fa-microphone')) {
+                        localTracks.audioTrack.setEnabled(false);
+                        console.log("Remote Audio Muted for: " + peerId);
+                    } else {
+                        localTracks.audioTrack.setEnabled(true);
+                        console.log("Remote Audio Unmuted for: " + peerId);
+                    }
+                    $("#remoteAudio-" + peerId).toggleClass('fa-microphone').toggleClass('fa-microphone-slash');
+                } else if (text == "video") {
+                    console.log("Remote video toggle reached with " + peerId);
+                    if ($("#remoteVideo-" + peerId).hasClass('fa-video')) {
+                        localTracks.videoTrack.setEnabled(false);
+                        console.log("Remote Video Muted for: " + peerId);
+                    } else {
+                        localTracks.videoTrack.setEnabled(true);
+                        console.log("Remote Video Unmuted for: " + peerId);
+                    }
+                    $("#remoteVideo-" + peerId).toggleClass('fa-video').toggleClass('fa-video-slash');
+                }
             })
             // Display channel member joined updated users
             channel.on('MemberJoined', function () {
@@ -248,6 +267,8 @@ async function subscribe(user, mediaType) {
 function handleUserPublished(user, mediaType) {
     const id = user.uid;
     remoteUsers[id] = user;
+    console.log("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx");
+    console.log(user, id)
     subscribe(user, mediaType);
 }
 
@@ -292,30 +313,4 @@ function toggleVideo() {
         console.log("Video Unmuted.");
     }
     $("#video-icon").toggleClass('fa-video').toggleClass('fa-video-slash');
-}
-
-// Toggle Remote Audio
-function toggleRemoteAudio(peerId) {
-    console.log("Remote video toggle reached with " + peerId);
-    if ($("#remoteAudio-" + peerId).hasClass('fa-microphone')) {
-        remoteUsers.audioTrack.setEnabled(false);
-        console.log("Remote Audio Muted for: " + peerId);
-    } else {
-        remoteUsers.audioTrack.setEnabled(true);
-        console.log("Remote Audio Unmuted for: " + peerId);
-    }
-    $("#remoteAudio-" + peerId).toggleClass('fa-microphone').toggleClass('fa-microphone-slash');
-}
-
-// Toggle Remote Video
-function toggleRemoteVideo(peerId) {
-    console.log("Remote video toggle reached with " + peerId);
-    if ($("#remoteVideo-" + peerId).hasClass('fa-video')) {
-        remoteUsers.videoTrack.setEnabled(false);
-        console.log("Remote Video Muted for: " + peerId);
-    } else {
-        remoteUsers.videoTrack.setEnabled(true);
-        console.log("Remote Video Unmuted for: " + peerId);
-    }
-    $("#remoteVideo-" + peerId).toggleClass('fa-video').toggleClass('fa-video-slash');
 }
