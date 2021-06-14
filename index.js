@@ -87,7 +87,7 @@ async function leave() {
 
 async function RTMJoin() {
     // Create Agora RTM client
-    const clientRTM = AgoraRTM.createInstance("a6af85f840ef43108491705e2315a857", {
+    const clientRTM = AgoraRTM.createInstance($("#appid").val(), {
         enableLogUpload: false
     });
     var accountName = $('#accountName').val();
