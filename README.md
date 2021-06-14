@@ -28,7 +28,7 @@ Sample app to mute the video and audio of remote users in a call using the RTM S
 - [Sample Video Call App](https://github.com/AgoraIO-Community/AgoraWebSDK-NG/tree/master/Demo/basicVideoCall)
 - [Agora RTM SDK Documentation](https://docs.agora.io/en/Real-time-Messaging/API%20Reference/RTM_web/v1.0.0/index.html)
 - [RTM Quickstart Guide](https://docs.agora.io/en/Real-time-Messaging/messaging_web?platform=Web)
-- [Guided Blog](#!)
+- [Guided Blog](https://medium.com/@akshatvg/muting-and-unmuting-a-remote-user-in-a-video-call-web-app-111d0fea386a)
 
 ## Requirements
 
