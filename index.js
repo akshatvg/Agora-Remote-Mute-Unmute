@@ -113,8 +113,8 @@ async function RTMJoin() {
                     <p>${singleMember}</p>
                 </div>
                 <div class="mb-4">
-                    <i class="fa text-white fa-microphone mx-3 remoteMicrophone" id="remoteAudio-${singleMember}"></i>
-                    <i class="fa text-white fa-video remoteCamera" id="remoteVideo-${singleMember}"></i>
+                    <button class="text-white btn btn-control mx-3 remoteMicrophone micOn" id="remoteAudio-${singleMember}">Toggle Mic</button>
+                    <button class="text-white btn btn-control remoteCamera camOn" id="remoteVideo-${singleMember}">Toggle Video</button>
                 </div>
              </li>`);
                 });
@@ -156,14 +156,6 @@ async function RTMJoin() {
                     }
                 })
             });
-            // Receive RTM Channel Message
-            channel.on('ChannelMessage', ({
-                text
-            }, senderId) => {
-                console.log("Message received successfully.");
-                console.log("The message is: " + text + " by " + senderId);
-                $("#actual-text").append("<br> <b>Speaker:</b> " + senderId + "<br> <b>Message:</b> " + text + "<br>");
-            });
             // Display messages from peer
             clientRTM.on('MessageFromPeer', function ({
                 text
@@ -171,24 +163,26 @@ async function RTMJoin() {
                 console.log(peerId + " muted/unmuted your " + text);
                 if (text == "audio") {
                     console.log("Remote video toggle reached with " + peerId);
-                    if ($("#remoteAudio-" + peerId).hasClass('fa-microphone')) {
+                    if ($("#remoteAudio-" + peerId).hasClass('micOn')) {
                         localTracks.audioTrack.setEnabled(false);
                         console.log("Remote Audio Muted for: " + peerId);
+                        $("#remoteAudio-" + peerId).removeClass('micOn');
                     } else {
                         localTracks.audioTrack.setEnabled(true);
                         console.log("Remote Audio Unmuted for: " + peerId);
+                        $("#remoteAudio-" + peerId).addClass('micOn');
                     }
-                    $("#remoteAudio-" + peerId).toggleClass('fa-microphone').toggleClass('fa-microphone-slash');
                 } else if (text == "video") {
                     console.log("Remote video toggle reached with " + peerId);
-                    if ($("#remoteVideo-" + peerId).hasClass('fa-video')) {
+                    if ($("#remoteVideo-" + peerId).hasClass('camOn')) {
                         localTracks.videoTrack.setEnabled(false);
                         console.log("Remote Video Muted for: " + peerId);
+                        $("#remoteVideo-" + peerId).removeClass('camOn');
                     } else {
                         localTracks.videoTrack.setEnabled(true);
                         console.log("Remote Video Unmuted for: " + peerId);
+                        $("#remoteVideo-" + peerId).addClass('camOn');
                     }
-                    $("#remoteVideo-" + peerId).toggleClass('fa-video').toggleClass('fa-video-slash');
                 }
             })
             // Display channel member joined updated users
@@ -203,8 +197,8 @@ async function RTMJoin() {
                           <p>${singleMember}</p>
                        </div>
                        <div class="mb-4">
-                         <i class="fa text-white fa-microphone mx-3 remoteMicrophone" id="remoteAudio-${singleMember}"></i>
-                         <i class="fa text-white fa-video remoteCamera" id="remoteVideo-${singleMember}"></i>
+                         <button class="text-white btn btn-control mx-3 remoteMicrophone micOn" id="remoteAudio-${singleMember}">Toggle Mic</button>
+                         <button class="text-white btn btn-control remoteCamera camOn" id="remoteVideo-${singleMember}">Toggle Video</button>
                         </div>
                      </li>`);
                     });
@@ -223,8 +217,8 @@ async function RTMJoin() {
                            <p>${singleMember}</p>
                        </div>
                        <div class="mb-4">
-                           <i class="fa text-white fa-microphone mx-3 remoteMicrophone" id="remoteAudio-${singleMember}"></i>
-                           <i class="fa text-white fa-video remoteCamera" id="remoteVideo-${singleMember}"></i>
+                           <button class="text-white btn btn-control mx-3 remoteMicrophone micOn" id="remoteAudio-${singleMember}">Toggle Mic</button>
+                           <button class="text-white btn btn-control remoteCamera camOn" id="remoteVideo-${singleMember}">Toggle Video</button>
                        </div>
                     </li>`);
                     });
@@ -315,5 +309,4 @@ function toggleVideo() {
     $("#video-icon").toggleClass('fa-video').toggleClass('fa-video-slash');
 }
 
-// Remove channel message
 // Remove own user
