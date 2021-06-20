@@ -47,7 +47,7 @@ async function join() {
     RTMJoin();
     // add event listener to play remote tracks when remote user publishs.
     client.on("user-published", handleUserPublished);
-    client.on("user-unpublished", handleUserUnpublished);
+    client.on("user-left", handleUserLeft);
     // join a channel and create local tracks, we can use Promise.all to run them concurrently
     [options.uid, localTracks.audioTrack, localTracks.videoTrack] = await Promise.all([
         // join the channel
@@ -272,7 +272,7 @@ function handleUserPublished(user, mediaType) {
 }
 
 // Handle user unpublish
-function handleUserUnpublished(user) {
+function handleUserLeft(user) {
     const id = user.uid;
     delete remoteUsers[id];
     $(`#player-wrapper-${id}`).remove();
