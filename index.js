@@ -271,7 +271,7 @@ function handleUserPublished(user, mediaType) {
     subscribe(user, mediaType);
 }
 
-// Handle user unpublish
+// Handle user left
 function handleUserLeft(user) {
     const id = user.uid;
     delete remoteUsers[id];
