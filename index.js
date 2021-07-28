@@ -1,8 +1,5 @@
 // Create Agora client
-var client = AgoraRTC.createClient({
-    mode: "rtc",
-    codec: "vp8"
-});
+var client = AgoraRTC.createClient({mode: "rtc", codec: "vp8"});
 
 // RTM Global Vars
 var isLoggedIn = false;
@@ -53,12 +50,16 @@ async function join() {
         // join the channel
         client.join(options.appid, options.channel, options.token || null),
         // create local tracks, using microphone and camera
-        AgoraRTC.createMicrophoneAudioTrack(),
+        AgoraRTC.createMicrophoneAudioTrack(
+            {AEC: true, ANS: true}
+        ),
         AgoraRTC.createCameraVideoTrack()
     ]);
     // play local video track
     localTracks.videoTrack.play("local-player");
-    $("#local-player-name").text(`localVideo(${options.uid})`);
+    $("#local-player-name").text(`localVideo(${
+        options.uid
+    })`);
     // publish local tracks to channel
     await client.publish(Object.values(localTracks));
     console.log("publish success");
@@ -85,16 +86,11 @@ async function leave() {
     console.log("client leaves channel success");
 }
 
-async function RTMJoin() {
-    // Create Agora RTM client
-    const clientRTM = AgoraRTM.createInstance($("#appid").val(), {
-        enableLogUpload: false
-    });
+async function RTMJoin() { // Create Agora RTM client
+    const clientRTM = AgoraRTM.createInstance($("#appid").val(), {enableLogUpload: false});
     var accountName = $('#accountName').val();
     // Login
-    clientRTM.login({
-        uid: accountName
-    }).then(() => {
+    clientRTM.login({uid: accountName}).then(() => {
         console.log('AgoraRTM client login success. Username: ' + accountName);
         isLoggedIn = true;
         // RTM Channel Join
@@ -109,7 +105,7 @@ async function RTMJoin() {
                 console.log(memberNames);
                 var newHTML = $.map(memberNames, function (singleMember) {
                     if (singleMember != accountName) {
-                        return (`<li class="mt-2">
+                        return(`<li class="mt-2">
                   <div class="row">
                       <p>${singleMember}</p>
                    </div>
@@ -129,10 +125,8 @@ async function RTMJoin() {
                 console.log("Remote microphone button pressed.");
                 let peerMessage = "audio";
                 clientRTM.sendMessageToPeer({
-                        text: peerMessage
-                    },
-                    peerId,
-                ).then(sendResult => {
+                    text: peerMessage
+                }, peerId,).then(sendResult => {
                     if (sendResult.hasPeerReceived) {
                         console.log("Message has been received by: " + peerId + " Message: " + peerMessage);
                     } else {
@@ -147,10 +141,8 @@ async function RTMJoin() {
                 console.log("Remote video button pressed.");
                 let peerMessage = "video";
                 clientRTM.sendMessageToPeer({
-                        text: peerMessage
-                    },
-                    peerId,
-                ).then(sendResult => {
+                    text: peerMessage
+                }, peerId,).then(sendResult => {
                     if (sendResult.hasPeerReceived) {
                         console.log("Message has been received by: " + peerId + " Message: " + peerMessage);
                     } else {
@@ -188,14 +180,13 @@ async function RTMJoin() {
                 }
             })
             // Display channel member joined updated users
-            channel.on('MemberJoined', function () {
-                // Get all members in RTM Channel
+            channel.on('MemberJoined', function () { // Get all members in RTM Channel
                 channel.getMembers().then((memberNames) => {
                     console.log("New member joined so updated list is: ");
                     console.log(memberNames);
                     var newHTML = $.map(memberNames, function (singleMember) {
                         if (singleMember != accountName) {
-                            return (`<li class="mt-2">
+                            return(`<li class="mt-2">
                       <div class="row">
                           <p>${singleMember}</p>
                        </div>
@@ -210,14 +201,13 @@ async function RTMJoin() {
                 });
             })
             // Display channel member left updated users
-            channel.on('MemberLeft', function () {
-                // Get all members in RTM Channel
+            channel.on('MemberLeft', function () { // Get all members in RTM Channel
                 channel.getMembers().then((memberNames) => {
                     console.log("A member left so updated list is: ");
                     console.log(memberNames);
                     var newHTML = $.map(memberNames, function (singleMember) {
                         if (singleMember != accountName) {
-                            return (`<li class="mt-2">
+                            return(`<li class="mt-2">
                       <div class="row">
                           <p>${singleMember}</p>
                        </div>
